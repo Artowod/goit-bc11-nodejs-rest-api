@@ -1,20 +1,25 @@
+/* ----------------- ROUTING ------------------- */
+
 const express = require("express");
 const router = express.Router();
-const contactsController = require("../controllers/contactsController");
+const contactsController = require("../controllers/");
 
 router.get("/", async (req, res, next) => {
   res.render("index", { description: "Please use the following path to manage contacts: /api/contacts" });
 });
 
-router.get("/api/contacts/", contactsController.listContacts);
+const subDomain = "/api/contacts/";
+router.get(subDomain, contactsController.listContacts);
 
-router.get("/api/contacts/:contactId", contactsController.getContactById);
+router.get(`${subDomain}:contactId`, contactsController.getContactById);
 
-router.delete("/api/contacts/:contactId", contactsController.removeContact);
+router.delete(`${subDomain}:contactId`, contactsController.removeContact);
 
-router.post("/api/contacts/", contactsController.addContact);
+router.post(`${subDomain}`, contactsController.addContact);
 
-router.put("/api/contacts/:contactId", contactsController.updateContact);
+router.put(`${subDomain}:contactId`, contactsController.updateContact);
+
+router.patch(`${subDomain}:contactId/favorite`, contactsController.updateFavoriteContact);
 
 // -------------------------testing---------------------------
 // router.get("/:contactId/:nextId/:lastId", async (req, res, next) => {
