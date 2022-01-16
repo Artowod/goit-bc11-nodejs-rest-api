@@ -1,4 +1,4 @@
-/* ----------------- DB Handling ------------------ */
+/* ----------------- Contacts DB Handling ------------------ */
 
 const Contacts = require("../schemas/contacts");
 

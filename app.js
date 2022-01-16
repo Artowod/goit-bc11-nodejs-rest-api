@@ -3,6 +3,21 @@ const logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const contactsRouter = require("./api/");
+const jwt = require("jsonwebtoken");
+
+/* ===============JWT coding - decoding=============== */
+const payload = { id: 12345, username: "Serg" };
+const secret = "secretum1";
+const token = jwt.sign(payload, secret);
+console.log("User token: ", token);
+
+const decodeToken = jwt.decode(token);
+console.log("Decode token: ", decodeToken);
+
+const verify = jwt.verify(token, secret);
+console.log("Verify token: ", verify);
+
+/* ===============JWT coding - decoding=============== */
 
 const app = express();
 
@@ -17,6 +32,8 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 app.use("/", contactsRouter);
+
+require("./config/config-passport");
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });

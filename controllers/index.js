@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const { findById, removeById, add, readDB, update, updateFavorite } = require("../service");
+const { findById, removeById, add, readDB, update, updateFavorite } = require("../service/contacts-service");
 
 // ====================VALIDATION-START=====================
 const validationSchema = Joi.object({
