@@ -9,10 +9,10 @@ const contacts = new Schema({
   email: { type: String },
   phone: { type: String },
   favorite: { type: Boolean, default: false },
-  // owner: {
-  //   type: SchemaTypes.ObjectId,
-  //   ref: "user",
-  // },
+  owner: {
+    type: mongoose.ObjectId,
+    ref: "user",
+  },
 });
 
 const Contacts = mongoose.model("contacts", contacts);

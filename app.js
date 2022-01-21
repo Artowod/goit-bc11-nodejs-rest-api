@@ -2,7 +2,6 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const contactsRouter = require("./api/");
 const jwt = require("jsonwebtoken");
 
 /* ===============JWT coding - decoding=============== */
@@ -31,9 +30,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
-app.use("/", contactsRouter);
 
 require("./config/config-passport");
+
+const routerApi = require("./api/");
+app.use("/", routerApi);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });

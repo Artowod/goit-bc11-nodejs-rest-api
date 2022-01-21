@@ -7,25 +7,26 @@ const contactsController = require("../controllers/");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
-// const passport = require("passport");
+const passport = require("passport");
 const User = require("../schemas/user");
 
-// const auth = (req, res, next) => {
-//   passport.authenticate("jwt", { session: false }, (err, user) => {
-//     if (!user || err) {
-//       return res.status(401).json({
-//         status: "error",
-//         code: 401,
-//         message: "Unauthorized",
-//         data: "Unauthorized",
-//       });
-//     }
-//     req.user = user;
-//     next();
-//   })(req, res, next);
-// };
+const auth = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    console.log("Bearer " + user.token);
+    if (!user || err || req.headers.authorization !== "Bearer " + user.token) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized",
+        data: "Unauthorized",
+      });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
 
-router.post("/api/registration", async (req, res, next) => {
+router.post("/users/signup", async (req, res, next) => {
   const { password, email, subscription } = req.body;
   const user = await User.findOne({ email });
   if (user) {
@@ -52,7 +53,7 @@ router.post("/api/registration", async (req, res, next) => {
   }
 });
 
-router.post("/api/login", async (req, res, next) => {
+router.post("/users/login", async (req, res, next) => {
   const { password, email } = req.body;
   const user = await User.findOne({ email });
 
@@ -71,6 +72,9 @@ router.post("/api/login", async (req, res, next) => {
   };
 
   const token = jwt.sign(payload, secret, { expiresIn: "1h" });
+
+  await User.updateOne({ _id: user.id }, { token });
+
   res.json({
     status: "success",
     code: 200,
@@ -80,12 +84,31 @@ router.post("/api/login", async (req, res, next) => {
   });
 });
 
+router.get("/users/logout", auth, async (req, res, next) => {
+  await User.updateOne({ _id: req.user.id }, { token: null });
+  res.json({
+    status: "success",
+    code: 200,
+  });
+});
+
+router.get("/users/current", auth, (req, res, next) => {
+  const { email } = req.user;
+  res.json({
+    status: "success",
+    code: 200,
+    data: {
+      message: `Authorization was successful: ${email}`,
+    },
+  });
+});
+
 router.get("/", async (req, res, next) => {
   res.render("index", { description: "Please use the following path to manage contacts: /api/contacts" });
 });
 
 const subDomain = "/api/contacts/";
-router.get(subDomain, contactsController.listContacts);
+router.get(subDomain, auth, contactsController.listContacts);
 
 router.get(`${subDomain}:contactId`, contactsController.getContactById);
 
