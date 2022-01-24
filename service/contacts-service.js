@@ -4,7 +4,7 @@ const Contacts = require("../schemas/contacts");
 
 async function readDB() {
   try {
-    const result = await Contacts.find();
+    const result = await Contacts.find().populate("owner");
     console.log("Reading DB...");
     return result;
   } catch (error) {

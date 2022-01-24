@@ -1,10 +1,51 @@
 /* ----------------- Users DB Handling ------------------ */
 
-const Users = require("../schemas/user");
+const { User } = require("../schemas/user");
 
-async function readDB() {
+async function userCheck({ email }) {
   try {
-    const result = await Users.find();
+    const result = await User.findOne({ email });
+    console.log("Reading DB...");
+    return result;
+  } catch (error) {
+    console.log("Read DB error: ", error);
+  }
+}
+
+async function userCreate(newUser) {
+  try {
+    const result = await newUser.save();
+    console.log("Creating user in DB...");
+    return result;
+  } catch (error) {
+    console.log("Create user DB error: ", error);
+  }
+}
+
+async function userUpdate(userId, token) {
+  try {
+    console.log(userId, "*", token);
+    const result = await User.findOneAndUpdate({ _id: userId }, { token: token });
+    console.log("Updating User in DB...");
+    return result;
+  } catch (error) {
+    console.log("Update user in DB error: ", error);
+  }
+}
+
+async function logout() {
+  try {
+    const result = await User.find();
+    console.log("Reading DB...");
+    return result;
+  } catch (error) {
+    console.log("Read DB error: ", error);
+  }
+}
+
+async function current() {
+  try {
+    const result = await User.find();
     console.log("Reading DB...");
     return result;
   } catch (error) {
@@ -63,10 +104,9 @@ async function readDB() {
 // }
 
 module.exports = {
-  // findById,
-  // removeById,
-  // add,
-  readDB,
-  // update,
-  // updateFavorite,
+  userCheck,
+  userCreate,
+  userUpdate,
+  logout,
+  current,
 };

@@ -15,6 +15,7 @@ const validationSchema = Joi.object({
     .pattern(/^[+]?[(]?[0-9]{3}[)]?[ ]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$/)
     .required(),
   favorite: Joi.boolean().required(),
+  // owner: Joi.string(),
 });
 
 const isDataValid = (data) => {
@@ -52,6 +53,7 @@ const addContact = async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       favorite: req.body.favorite ? req.body.favorite : false,
+      // owner: req.user._id,
     };
 
     if (!isDataValid(newContact)) {

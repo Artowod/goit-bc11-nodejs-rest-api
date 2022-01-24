@@ -2,13 +2,13 @@
 
 const express = require("express");
 const router = express.Router();
-const contactsController = require("../controllers/");
+const contactsController = require("../../controllers/contacts-controller");
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
 const passport = require("passport");
-const User = require("../schemas/user");
+const User = require("../../schemas/user");
 
 const auth = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user) => {
@@ -26,7 +26,7 @@ const auth = (req, res, next) => {
   })(req, res, next);
 };
 
-router.post("/users/signup", async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   const { password, email, subscription } = req.body;
   const user = await User.findOne({ email });
   if (user) {
@@ -53,7 +53,7 @@ router.post("/users/signup", async (req, res, next) => {
   }
 });
 
-router.post("/users/login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   const { password, email } = req.body;
   const user = await User.findOne({ email });
 
@@ -84,7 +84,7 @@ router.post("/users/login", async (req, res, next) => {
   });
 });
 
-router.get("/users/logout", auth, async (req, res, next) => {
+router.get("/logout", auth, async (req, res, next) => {
   await User.updateOne({ _id: req.user.id }, { token: null });
   res.json({
     status: "success",
@@ -92,7 +92,7 @@ router.get("/users/logout", auth, async (req, res, next) => {
   });
 });
 
-router.get("/users/current", auth, (req, res, next) => {
+router.get("/current", auth, (req, res, next) => {
   const { email } = req.user;
   res.json({
     status: "success",
@@ -107,18 +107,18 @@ router.get("/", async (req, res, next) => {
   res.render("index", { description: "Please use the following path to manage contacts: /api/contacts" });
 });
 
-const subDomain = "/api/contacts/";
+const subDomain = "/contacts/";
 router.get(subDomain, auth, contactsController.listContacts);
 
-router.get(`${subDomain}:contactId`, contactsController.getContactById);
+router.get(`${subDomain}:contactId`, auth, contactsController.getContactById);
 
-router.delete(`${subDomain}:contactId`, contactsController.removeContact);
+router.delete(`${subDomain}:contactId`, auth, contactsController.removeContact);
 
-router.post(`${subDomain}`, contactsController.addContact);
+router.post(`${subDomain}`, auth, contactsController.addContact);
 
-router.put(`${subDomain}:contactId`, contactsController.updateContact);
+router.put(`${subDomain}:contactId`, auth, contactsController.updateContact);
 
-router.patch(`${subDomain}:contactId/favorite`, contactsController.updateFavoriteContact);
+router.patch(`${subDomain}:contactId/favorite`, auth, contactsController.updateFavoriteContact);
 
 // -------------------------testing---------------------------
 // router.get("/:contactId/:nextId/:lastId", async (req, res, next) => {
