@@ -1,10 +1,10 @@
 /* ----------------- Contacts DB Handling ------------------ */
 
-const Contacts = require("../schemas/contacts");
+const { Contact } = require("../schemas/contacts");
 
-async function readDB() {
+async function readDB(owner) {
   try {
-    const result = await Contacts.find().populate("owner");
+    const result = await Contact.find({ owner }); /* .populate("owner") */
     console.log("Reading DB...");
     return result;
   } catch (error) {
@@ -12,9 +12,9 @@ async function readDB() {
   }
 }
 
-async function findById(id) {
+async function findById(id, owner) {
   try {
-    const result = await Contacts.findOne({ _id: id });
+    const result = await Contact.findOne({ _id: id, owner });
     console.log("Searching by ID...");
     return result;
   } catch (error) {
@@ -22,9 +22,9 @@ async function findById(id) {
   }
 }
 
-async function removeById(id) {
+async function removeById(id, owner) {
   try {
-    const result = await Contacts.findOneAndRemove({ _id: id });
+    const result = await Contact.findOneAndRemove({ _id: id, owner });
     console.log("Removing by ID...");
     return result;
   } catch (error) {
@@ -34,7 +34,7 @@ async function removeById(id) {
 
 async function add(data) {
   try {
-    const result = await Contacts.create(data);
+    const result = await Contact.create(data);
     console.log("Creating new contact...");
     return result;
   } catch (error) {
@@ -42,9 +42,9 @@ async function add(data) {
   }
 }
 
-async function update(id, contact) {
+async function update(id, owner, contact) {
   try {
-    const result = await Contacts.findOneAndUpdate({ _id: id }, { $set: contact }, { new: true });
+    const result = await Contact.findOneAndUpdate({ _id: id, owner }, { $set: contact }, { new: true });
     console.log("Updating by ID...");
     return result;
   } catch (error) {
@@ -52,9 +52,9 @@ async function update(id, contact) {
   }
 }
 
-async function updateFavorite(id, body) {
+async function updateFavorite(id, owner, body) {
   try {
-    const result = await Contacts.findOneAndUpdate({ _id: id }, { $set: body }, { new: true });
+    const result = await Contact.findOneAndUpdate({ _id: id, owner }, { $set: body }, { new: true });
     console.log("Favorite Updating...");
     return result;
   } catch (error) {
