@@ -32,30 +32,8 @@ async function userUpdate(userId, token) {
   }
 }
 
-async function logout() {
-  try {
-    const result = await User.find();
-    console.log("Reading DB...");
-    return result;
-  } catch (error) {
-    console.log("Read DB error: ", error);
-  }
-}
-
-async function current() {
-  try {
-    const result = await User.find();
-    console.log("Reading DB...");
-    return result;
-  } catch (error) {
-    console.log("Read DB error: ", error);
-  }
-}
-
 module.exports = {
   userCheck,
   userCreate,
   userUpdate,
-  logout,
-  current,
 };
