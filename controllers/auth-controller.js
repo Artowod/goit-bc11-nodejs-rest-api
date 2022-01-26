@@ -3,6 +3,11 @@ const authService /* {  signup, login, logout, current,  }  */ = require("../ser
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
+const gravatar = require("gravatar");
+// const DEFAULT_PUBLIC_LOCATION = "http://127.0.0.1:3000/avatars/";
+
+const avatarURLCreation = (email) => gravatar.url(email, { s: "250", d: "monsterid", protocol: "http" });
+// gravatar.url(email, { s: "250", d: `${DEFAULT_PUBLIC_LOCATION}orc.jpg`, protocol: "http" });
 
 const signup = async (req, res, next) => {
   const { error } = joiUserSchema.validate(req.body);
@@ -19,6 +24,7 @@ const signup = async (req, res, next) => {
 
   const newUser = new User({ password, email });
   newUser.setPassword(password);
+  newUser.avatarURL = avatarURLCreation(email);
   const result = await authService.userCreate(newUser);
   return result
     ? res.status(201).json({
@@ -51,7 +57,7 @@ const login = async (req, res, next) => {
 
   const token = jwt.sign(payload, secret, { expiresIn: "1h" });
 
-  await authService.userUpdate(user.id, token);
+  await authService.tokenUpdate(user.id, token);
   res.status(200).json({
     token,
     user: {
@@ -63,7 +69,7 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   const token = null;
-  await authService.userUpdate(req.user.id, token);
+  await authService.tokenUpdate(req.user.id, token);
   res.status(204).json({
     message: "Logout success",
   });
@@ -77,4 +83,11 @@ const current = async (req, res, next) => {
   });
 };
 
-module.exports = { signup, login, logout, current };
+const avatars = async (req, res, next) => {
+  await authService.avatarUpdate(req.user.id, req.newAvatar /* ???????? */);
+  res.status(204).json({
+    message: "Logout success",
+  });
+};
+
+module.exports = { signup, login, logout, current, avatars };

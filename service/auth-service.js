@@ -22,9 +22,19 @@ async function userCreate(newUser) {
   }
 }
 
-async function userUpdate(userId, token) {
+async function tokenUpdate(userId, token) {
   try {
     const result = await User.findOneAndUpdate({ _id: userId }, { token: token });
+    console.log("Updating User in DB...");
+    return result;
+  } catch (error) {
+    console.log("Update user in DB error: ", error);
+  }
+}
+
+async function avatarUpdate(userId, avatarURL) {
+  try {
+    const result = await User.findOneAndUpdate({ _id: userId }, { avatarURL });
     console.log("Updating User in DB...");
     return result;
   } catch (error) {
@@ -35,5 +45,6 @@ async function userUpdate(userId, token) {
 module.exports = {
   userCheck,
   userCreate,
-  userUpdate,
+  tokenUpdate,
+  avatarUpdate,
 };
