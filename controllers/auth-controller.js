@@ -3,11 +3,15 @@ const authService /* {  signup, login, logout, current,  }  */ = require("../ser
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
+const TEMP_STORAGE = process.env.TEMP_STORAGE;
+const PUBLIC_STORAGE = process.env.PUBLIC_STORAGE;
 const gravatar = require("gravatar");
-// const DEFAULT_PUBLIC_LOCATION = "http://127.0.0.1:3000/avatars/";
+const fs = require("fs").promises;
+const path = require("path");
+const Jimp = require("jimp");
 
-const avatarURLCreation = (email) => gravatar.url(email, { s: "250", d: "monsterid", protocol: "http" });
-// gravatar.url(email, { s: "250", d: `${DEFAULT_PUBLIC_LOCATION}orc.jpg`, protocol: "http" });
+const avatarURLCreation = (email, photo = "monsterid") =>
+  gravatar.url(email, { /*  s: "250",  */ d: photo, protocol: "http" });
 
 const signup = async (req, res, next) => {
   const { error } = joiUserSchema.validate(req.body);
@@ -84,9 +88,46 @@ const current = async (req, res, next) => {
 };
 
 const avatars = async (req, res, next) => {
-  await authService.avatarUpdate(req.user.id, req.newAvatar /* ???????? */);
-  res.status(204).json({
-    message: "Logout success",
+  //  await authService.avatarUpdate(req.user.id, req.newAvatar /* ???????? */);
+  const subFolder = "avatars";
+
+  const { filename } = req.file;
+  const temporaryFile = path.join(__dirname, `../${TEMP_STORAGE}/`, filename);
+  const publicFile = path.join(__dirname, `../${PUBLIC_STORAGE}/${subFolder}/`, filename);
+
+  const publicFileForRemoteAccess = `http://127.0.0.1:3000/${subFolder}/${filename}`; // "http://127.0.0.1:3000/avatars/elf.jpg";
+
+  // +1 - store file to temp dir - already done in middleware
+  // +2 - modify by jimp  - res => 250x250
+  // +3 - move it to public place
+  // +4 - unique file name  - already in middleware
+  // +5 - store url to DB
+
+  await Jimp.read(temporaryFile)
+    .then((picture) => {
+      return picture.resize(250, Jimp.AUTO).quality(80).write(publicFile);
+    })
+    .then(() => fs.rm(temporaryFile))
+    .catch((err) => {
+      console.error(err);
+      res.status(400).json({ status: "Fail", message: err });
+    });
+
+  // const remotePic = "https://gdb.rferl.org/08810000-0a00-0242-2050-08d9da027939_w1023_r1_s.jpg";
+  // const remotePic = "http://127.0.0.1:3000/avatars/elf.jpg";
+
+  const generatedGravatarUrl = avatarURLCreation(req.user.email, publicFileForRemoteAccess /* remotePic */);
+  await authService.avatarUpdate(req.user.id, generatedGravatarUrl);
+
+  // res.status(204).json({
+  //   message: "Avatar changed successfully",
+  // });
+  res.json({
+    message: "Avatar changed successfully",
+    "------": "--------------------------------",
+    generatedGravatarUrl,
+    avatar_pic: publicFile,
+    avatar_pic_forRemote: publicFileForRemoteAccess,
   });
 };
 

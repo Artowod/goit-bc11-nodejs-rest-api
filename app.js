@@ -3,10 +3,11 @@ const logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-
 const app = express();
-
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
+
+require("dotenv").config();
+const PUBLIC_STORAGE = process.env.PUBLIC_STORAGE;
 
 app.set("views", "./views");
 app.set("view engine", "ejs");
@@ -20,7 +21,7 @@ app.use(express.json());
 // or // app.use(express.static(path.join(__dirname, "public")));
 // or // app.use(express.static("./public"));
 // ===========================
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, PUBLIC_STORAGE)));
 
 require("./config/config-passport");
 
