@@ -2,25 +2,12 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-// const jwt = require("jsonwebtoken");
-
-/* ===============JWT coding - decoding=============== */
-// const payload = { id: 12345, username: "Serg" };
-// const secret = "secretum1";
-// const token = jwt.sign(payload, secret);
-// console.log("User token: ", token);
-
-// const decodeToken = jwt.decode(token);
-// console.log("Decode token: ", decodeToken);
-
-// const verify = jwt.verify(token, secret);
-// console.log("Verify token: ", verify);
-
-/* ===============JWT coding - decoding=============== */
-
+const path = require("path");
 const app = express();
-
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
+
+require("dotenv").config();
+const PUBLIC_STORAGE = process.env.PUBLIC_STORAGE;
 
 app.set("views", "./views");
 app.set("view engine", "ejs");
@@ -30,6 +17,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
+// ===========================
+// or // app.use(express.static(path.join(__dirname, "public")));
+// or // app.use(express.static("./public"));
+// ===========================
+app.use(express.static(path.join(__dirname, PUBLIC_STORAGE)));
 
 require("./config/config-passport");
 
