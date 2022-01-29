@@ -7,7 +7,7 @@ const app = express();
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 require("dotenv").config();
-const PUBLIC_STORAGE = process.env.PUBLIC_STORAGE;
+const { PUBLIC_STORAGE } = process.env;
 
 app.set("views", "./views");
 app.set("view engine", "ejs");

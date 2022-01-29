@@ -42,9 +42,20 @@ async function avatarUpdate(userId, avatarURL) {
   }
 }
 
+async function checkVerificationToken(verificationToken) {
+  try {
+    const result = await User.findOneAndUpdate({ verificationToken }, { verificationToken: null, verify: true });
+    console.log("Updating User by VerificationToken in DB...");
+    return result;
+  } catch (error) {
+    console.log("Update user in DB be VerificationToken error: ", error);
+  }
+}
+
 module.exports = {
   userCheck,
   userCreate,
   tokenUpdate,
   avatarUpdate,
+  checkVerificationToken,
 };
