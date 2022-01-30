@@ -15,5 +15,7 @@ router.post("/login", authController.login);
 router.post("/logout", auth, authController.logout);
 router.get("/current", auth, authController.current);
 router.post("/avatars", [auth, avatarUpload], authController.avatars);
+router.get("/verify/:verificationToken", authController.verify);
+router.post("/verify/", authController.reVerify);
 
 module.exports = router;

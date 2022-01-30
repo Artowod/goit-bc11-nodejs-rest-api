@@ -7,7 +7,13 @@ const auth = (req, res, next) => {
     // console.log("Bearer " + user.token);
     if (!user || err || req.headers.authorization !== "Bearer " + user.token) {
       return res.status(401).json({
-        message: "Not authorized",
+        message: "User is not authorized.",
+      });
+    }
+    if (!user.verify) {
+      return res.status(401).json({
+        message:
+          "Email is not verified. Please use verification link which was sent to you on your email during the registration.",
       });
     }
     req.user = user;
